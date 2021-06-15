@@ -14,10 +14,12 @@ class RetrofitInstance {
     companion object{
         val BASE_URL = "https://jsonplaceholder.typicode.com/"
 
+        // Logging interceptor
         val interceptor = HttpLoggingInterceptor().apply {
             this.level = HttpLoggingInterceptor.Level.BODY
         }
 
+        //  Time outs
         val client = OkHttpClient.Builder().apply {
             this.addInterceptor(interceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)

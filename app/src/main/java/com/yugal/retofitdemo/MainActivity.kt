@@ -17,13 +17,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        getRequestWithQueryParameters()
+        retService = RetrofitInstance
+            .getRetofitInstance()
+            .create(AlbumService::class.java)
+
+        //getRequestWithQueryParameters()
+        uploadAlbums()
 }
 
+
 private fun getRequestWithQueryParameters(){
-    retService = RetrofitInstance
-        .getRetofitInstance()
-        .create(AlbumService::class.java)
 
     //path parameter example
     val pathResponse : LiveData<Response<AlbumItem>> = liveData {
@@ -35,6 +38,7 @@ private fun getRequestWithQueryParameters(){
         val title = it.body()?.title
         Toast.makeText(applicationContext, title, Toast.LENGTH_LONG).show()
     })
+
 
 
     val responseLiveData:LiveData<Response<Album>> = liveData {
@@ -54,4 +58,18 @@ private fun getRequestWithQueryParameters(){
         }
     })
 }
+    private fun uploadAlbums(){
+        val album = AlbumItem(0,"My titlr",3)
+        val postResponse : LiveData<Response<AlbumItem>> = liveData{
+            val response:Response<AlbumItem> = retService.uploadAlbum(album)
+            emit(response)
+        }
+        postResponse.observe(this, Observer {
+            val receivedAlbumsItem = it.body()
+            val result : String = " "+ "Album Title: ${receivedAlbumsItem?.title}"+"\n"+
+                    " "+ "Album id: ${receivedAlbumsItem?.id}"+"\n"+
+                    " "+ "user id: ${receivedAlbumsItem?.userId}"+"\n\n\n"
+            text_view.text = result
+        })
+    }
 }
